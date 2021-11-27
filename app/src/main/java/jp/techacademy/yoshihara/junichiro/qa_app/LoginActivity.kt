@@ -3,6 +3,7 @@ package jp.techacademy.yoshihara.junichiro.qa_app
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.preference.PreferenceManager
@@ -152,7 +153,9 @@ class LoginActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
 
         // ログインする
+        Log.d("通過前", "通過前")
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(mLoginListener)
+        Log.d("通過後", "通過後")
     }
 
     private fun saveName(name: String) {
