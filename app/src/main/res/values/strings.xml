@@ -28,7 +28,6 @@
     <string name="menu_health_label">健康</string>
     <string name="menu_compter_label">コンピューター</string>
 
-
     <!-- 設定画面用文字列 -->
     <string name="settings_titile">設定</string>
     <string name="change_name_hint">@string/login_name_hint</string>
@@ -58,5 +57,6 @@
 
     <string name="send_answer_failure">投稿に失敗しました</string>
     <string name="answer_error_message">回答を入力してください</string>
+
     <string name="favorite_title">お気に入り</string>
 </resources>

@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_star.xml" value="0.23333333333333334" />
+        <entry key="app/src/main/res/drawable/ic_star_border.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/layout/activity_answer_send.xml" value="0.21557971014492755" />
         <entry key="app/src/main/res/layout/activity_favorite.xml" value="0.21557971014492755" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.21557971014492755" />
