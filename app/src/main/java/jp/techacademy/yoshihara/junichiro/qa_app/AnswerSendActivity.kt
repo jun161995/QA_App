@@ -70,4 +70,4 @@ class AnswerSendActivity : AppCompatActivity(), View.OnClickListener, DatabaseRe
         progressBar.visibility = View.VISIBLE
         answerRef.push().setValue(data, this)
     }
-}}
+}

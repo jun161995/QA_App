@@ -1,31 +1,50 @@
 package jp.techacademy.yoshihara.junichiro.qa_app
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import androidx.navigation.fragment.findNavController
+import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
-class FirstFragment : Fragment() {
+class FavoriteActivity : AppCompatActivity() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false)
+    private var mFavorite: MutableList<String> = mutableListOf()
+    private var keySplit: List<String> = ArrayList<String>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_favorite)
+        Log.d("TEST", "CREATE")
+        title = "お気に入り"
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onResume() {
+        super.onResume()
+        load()
 
-        view.findViewById<Button>(R.id.button_first).setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+    }
+
+    private fun load() {
+        val data = getSharedPreferences("favoriteFlags", Context.MODE_PRIVATE)
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            for (entry in data.all) {
+                val key: String = entry.key
+                keySplit = key.split("/")
+                if (user.uid.toString() == keySplit[0].toString()) {
+                    val value: Any? = entry.value
+                    Log.d("TEST", keySplit[1].toString())
+
+                    mFavorite.add(keySplit[1].toString())
+                }
+            }
         }
+
+        val listView = findViewById<ListView>(R.id.listViewFavorite)
+        val adapter = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, mFavorite)
+
+        listView.adapter = adapter
     }
 }
