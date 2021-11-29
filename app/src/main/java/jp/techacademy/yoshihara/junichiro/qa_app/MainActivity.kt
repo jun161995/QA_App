@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var mAdapter: QuestionsListAdapter
 
     private var mGenreRef: DatabaseReference? = null
+    private var snapshotListener: ListenerRegistration? = null
 
     private val mEventListener = object : ChildEventListener {
         override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
@@ -136,6 +137,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
+        val navigationView = findViewById<NavigationView>(com.google.firebase.database.R.id.nav_view)
         nav_view.setNavigationItemSelectedListener(this)
 
         // Firebase
@@ -172,8 +174,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == R.id.action_settings) {
+        if (id == com.google.firebase.database.R.id.action_settings) {
             val intent = Intent(applicationContext, SettingActivity::class.java)
+            startActivity(intent)
+            return true
+        }else if (id == com.google.firebase.database.R.id.action_favorite) {
+            val intent = Intent(applicationContext, FavoriteActivity::class.java)
             startActivity(intent)
             return true
         }
@@ -206,15 +212,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mAdapter.setQuestionArrayList(mQuestionArrayList)
         listView.adapter = mAdapter
 
+        snapshotListener?.remove()
+
         // 選択したジャンルにリスナーを登録する
-        if (mGenreRef != null) {
-            mGenreRef!!.removeEventListener(mEventListener)
-        }
-        mGenreRef = mDatabaseReference.child(ContentsPATH).child(mGenre.toString())
-        mGenreRef!!.addChildEventListener(mEventListener)
-
+        snapshotListener = FirebaseFirestore.getInstance()
+            .collection(ContentsPATH)
+            .whereEqualTo("genre", mGenre)
+            .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                if (firebaseFirestoreException != null) {
+                    // 取得エラー
+                    return@addSnapshotListener
+                }
+                var questions = listOf<Question>()
+                val results = querySnapshot?.toObjects(FirestoreQuestion::class.java)
+                results?.also {
+                    questions = it.map { firestoreQuestion ->
+                        val bytes =
+                            if (firestoreQuestion.image.isNotEmpty()) {
+                                Base64.decode(firestoreQuestion.image, Base64.DEFAULT)
+                            } else {
+                                byteArrayOf()
+                            }
+                        Question(firestoreQuestion.title, firestoreQuestion.body, firestoreQuestion.name, firestoreQuestion.uid,
+                            firestoreQuestion.id, firestoreQuestion.genre, bytes, firestoreQuestion.answers)
+                    }
+                }
+                mQuestionArrayList.clear()
+                mQuestionArrayList.addAll(questions)
+                mAdapter.notifyDataSetChanged()
+            }
         return true
-        // --- ここまで追加する ---
     }
-
 }

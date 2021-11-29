@@ -12,7 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".QuestionDetailActivity"></activity>
+        <meta-data
+            android:name="com.google.android.actions"
+            android:resource="@xml/actions" />
+
+        <activity android:name=".FavoriteActivity" />
+        <activity android:name=".AnswerSendActivity" />
+        <activity android:name=".QuestionDetailActivity" />
+        <activity android:name=".QuestionSendActivity" />
+        <activity android:name=".SettingActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -24,10 +32,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".SettingActivity"></activity>
-        <activity android:name=".QuestionSendActivity"></activity>
-        <activity android:name=".QuestionDetailActivity"></activity>
-        <activity android:name=".AnswerSendActivity"></activity>
     </application>
 
 </manifest>

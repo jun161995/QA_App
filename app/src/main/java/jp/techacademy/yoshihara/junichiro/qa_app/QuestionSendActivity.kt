@@ -142,10 +142,13 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
             // Preferenceから名前を取る
             val sp = PreferenceManager.getDefaultSharedPreferences(this)
             val name = sp.getString(NameKEY, "")
+            var fireStoreQuestion = FirestoreQuestion()
 
-            data["title"] = title
-            data["body"] = body
-            data["name"] = name!!
+            fireStoreQuestion.uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+            fireStoreQuestion.title = title
+            fireStoreQuestion.body = body
+            fireStoreQuestion.name = name!!
+            fireStoreQuestion.genre = mGenre
 
             // 添付画像を取得する
             val drawable = imageView.drawable as? BitmapDrawable
