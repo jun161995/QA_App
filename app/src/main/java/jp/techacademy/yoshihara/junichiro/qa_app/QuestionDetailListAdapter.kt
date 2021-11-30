@@ -12,7 +12,7 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.list_question_detail.view.*
 
-class QuestionDetailListAdapter(context: Context, private val mQustion: Question) : BaseAdapter() {
+class QuestionDetailListAdapter(context: Context, private val mQuestion: Question) : BaseAdapter() {
     companion object {
         private val TYPE_QUESTION = 0
         private val TYPE_ANSWER = 1
@@ -27,7 +27,7 @@ class QuestionDetailListAdapter(context: Context, private val mQustion: Question
     }
 
     override fun getCount(): Int {
-        return 1 + mQustion.answers.size
+        return 1 + mQuestion.answers.size
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -43,7 +43,7 @@ class QuestionDetailListAdapter(context: Context, private val mQustion: Question
     }
 
     override fun getItem(position: Int): Any {
-        return mQustion
+        return mQuestion
     }
 
     override fun getItemId(position: Int): Long {
@@ -62,8 +62,8 @@ class QuestionDetailListAdapter(context: Context, private val mQustion: Question
                         mLayoutInflater!!.inflate(R.layout.list_question_detail, parent, false)!!
                 }
             }
-            val body = mQustion.body
-            val name = mQustion.name
+            val body = mQuestion.body
+            val name = mQuestion.name
 
             val bodyTextView = convertView.bodyTextView as TextView
             bodyTextView.text = body
@@ -71,19 +71,19 @@ class QuestionDetailListAdapter(context: Context, private val mQustion: Question
             val nameTextView = convertView.nameTextView as TextView
             nameTextView.text = name
 
-            val bytes = mQustion.imageBytes
+            val bytes = mQuestion.imageBytes
             if (bytes.isNotEmpty()) {
                 val image = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).copy(Bitmap.Config.ARGB_8888, true)
                 val imageView = convertView.findViewById<View>(R.id.imageView) as ImageView
                 imageView.setImageBitmap(image)
             }
 
-            titleFFlag = mQustion.title
+            titleFFlag = mQuestion.title
 
             var context = convertView.context
 
             val data = context.getSharedPreferences("favoriteFlags", Context.MODE_PRIVATE)
-            isFavorite = data.getBoolean(mQustion.uid+"/"+titleFFlag,false)
+            isFavorite = data.getBoolean(mQuestion.uid+"/"+titleFFlag,false)
 
             if (FirebaseAuth.getInstance().currentUser != null) {
                 var favoriteImageView = convertView.findViewById<ImageView>(R.id.favoriteImageView)
@@ -92,10 +92,10 @@ class QuestionDetailListAdapter(context: Context, private val mQustion: Question
                     val edit = data.edit()
                     if(isFavorite) {
                         isFavorite = false
-                        edit.putBoolean(mQustion.uid+"/"+titleFFlag,false)
+                        edit.putBoolean(mQuestion.uid+"/"+titleFFlag,false)
                     }else {
                         isFavorite = true
-                        edit.putBoolean(mQustion.uid+"/"+titleFFlag,true)
+                        edit.putBoolean(mQuestion.uid+"/"+titleFFlag,true)
                     }
                     edit.commit()
                     favoriteImageView.setImageResource(if (isFavorite) R.drawable.ic_star else R.drawable.ic_star_border)
@@ -106,7 +106,7 @@ class QuestionDetailListAdapter(context: Context, private val mQustion: Question
                 convertView = mLayoutInflater!!.inflate(R.layout.list_answer, parent, false)!!
             }
 
-            val answer = mQustion.answers[position - 1]
+            val answer = mQuestion.answers[position - 1]
             val body = answer.body
             val name = answer.name
 

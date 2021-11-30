@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.preference.PreferenceManager
@@ -24,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_question_send.*
 import java.io.ByteArrayOutputStream
 
@@ -143,6 +145,7 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
             val sp = PreferenceManager.getDefaultSharedPreferences(this)
             val name = sp.getString(NameKEY, "")
             var fireStoreQuestion = FirestoreQuestion()
+            Log.d("test", title)
 
             fireStoreQuestion.uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             fireStoreQuestion.title = title
@@ -160,11 +163,23 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
                 val bitmapString = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
 
-                data["image"] = bitmapString
+                fireStoreQuestion.image = bitmapString
             }
 
             genreRef.push().setValue(data, this)
-            progressBar.visibility = View.VISIBLE
+            FirebaseFirestore.getInstance()
+                .collection(ContentsPATH)
+                .document(fireStoreQuestion.id)
+                .set(fireStoreQuestion)
+                .addOnSuccessListener {
+                    progressBar.visibility = View.GONE
+                    finish()
+                }
+                .addOnFailureListener {
+                    it.printStackTrace()
+                    progressBar.visibility = View.GONE
+                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.question_send_error_message), Snackbar.LENGTH_LONG).show()
+                }
         }
     }
 

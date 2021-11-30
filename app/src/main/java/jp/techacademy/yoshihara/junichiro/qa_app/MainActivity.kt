@@ -4,6 +4,7 @@ package jp.techacademy.yoshihara.junichiro.qa_app
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
     }
-
+//まずここが呼び出される
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -218,10 +219,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.nav_compter) {
             toolbar.title = getString(R.string.menu_compter_label)
             mGenre = 4
+        } else if (id == R.id.action_favorite) {
+            val intent = Intent(applicationContext, FavoriteActivity::class.java)
+            startActivity(intent)
+            return true
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
-
+        //0ならデータをとってこれていない
+        //Log.d("test", mQuestionArrayList.size.toString())
         mQuestionArrayList.clear()
         mAdapter.setQuestionArrayList(mQuestionArrayList)
         listView.adapter = mAdapter
@@ -229,16 +235,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         snapshotListener?.remove()
 
         // 選択したジャンルにリスナーを登録する
+
         snapshotListener = FirebaseFirestore.getInstance()
             .collection(ContentsPATH)
             .whereEqualTo("genre", mGenre)
             .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                Log.d("test", querySnapshot.toString())
+                Log.d("test", firebaseFirestoreException.toString())
                 if (firebaseFirestoreException != null) {
                     // 取得エラー
                     return@addSnapshotListener
                 }
                 var questions = listOf<Question>()
                 val results = querySnapshot?.toObjects(FirestoreQuestion::class.java)
+                Log.d("test", results.toString())
                 results?.also {
                     questions = it.map { firestoreQuestion ->
                         val bytes =

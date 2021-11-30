@@ -16,7 +16,6 @@ class FavoriteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorite)
-        Log.d("TEST", "CREATE")
         title = "お気に入り"
     }
 
