@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
     }
-//まずここが呼び出される
+    //まずここが呼び出される
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -220,9 +220,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toolbar.title = getString(R.string.menu_compter_label)
             mGenre = 4
         } else if (id == R.id.action_favorite) {
-            val intent = Intent(applicationContext, FavoriteActivity::class.java)
-            startActivity(intent)
-            return true
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                val intent = Intent(applicationContext, FavoriteActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

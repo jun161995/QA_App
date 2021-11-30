@@ -32,10 +32,9 @@ class FavoriteActivity : AppCompatActivity() {
             for (entry in data.all) {
                 val key: String = entry.key
                 keySplit = key.split("/")
-                if (user.uid.toString() == keySplit[0].toString()) {
-                    val value: Any? = entry.value
-                    Log.d("TEST", keySplit[1].toString())
-
+                val value: Any? = entry.value
+                Log.d("TEST", keySplit[1].toString())
+                if (entry.value == true) {
                     mFavorite.add(keySplit[1].toString())
                 }
             }
