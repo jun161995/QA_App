@@ -9,6 +9,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import com.google.android.material.navigation.NavigationView
@@ -174,8 +175,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume() {
         super.onResume()
+        val user = FirebaseAuth.getInstance().currentUser
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
-
+        if (user == null) {
+            navigationView.menu.findItem(R.id.action_favorite).isVisible = false
+        }else{
+            navigationView.menu.findItem(R.id.action_favorite).isVisible = true
+        }
         // 1:趣味を既定の選択とする
         if (mGenre == 0) {
             onNavigationItemSelected(navigationView.menu.getItem(0))
@@ -203,6 +209,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         return super.onOptionsItemSelected(item)
     }
+//    val user = FirebaseAuth.getInstance().currentUser
+//    nav_view.menu.getItem(4).isVisible = user != null
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
@@ -219,14 +227,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.nav_compter) {
             toolbar.title = getString(R.string.menu_compter_label)
             mGenre = 4
-        } else if (id == R.id.action_favorite) {
+        }
+        else if (id == R.id.action_favorite) {
             val user = FirebaseAuth.getInstance().currentUser
             if (user != null) {
                 val intent = Intent(applicationContext, FavoriteActivity::class.java)
                 startActivity(intent)
+//                else if (id == R.id.nav_favorite) {
+//                    toolbar.title = "お気に入り一覧"
+//                    mGenre = 5
                 return true
-            }
 
+            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
