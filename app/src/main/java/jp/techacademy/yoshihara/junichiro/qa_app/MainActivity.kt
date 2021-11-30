@@ -1,10 +1,11 @@
 package jp.techacademy.yoshihara.junichiro.qa_app
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -13,19 +14,19 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-// findViewById()を呼び出さずに該当Viewを取得するために必要となるインポート宣言
+//import com.google.firebase.database.R
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private var mGenre = 0
 
-    // --- ここから ---
     private lateinit var mDatabaseReference: DatabaseReference
     private lateinit var mQuestionArrayList: ArrayList<Question>
     private lateinit var mAdapter: QuestionsListAdapter
@@ -61,8 +62,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-            val question = Question(title, body, name, uid, dataSnapshot.key ?: "",
-                mGenre, bytes, answerArrayList)
+            val question = Question(
+                title, body, name, uid, dataSnapshot.key ?: "",
+                mGenre, bytes, answerArrayList
+            )
             mQuestionArrayList.add(question)
             mAdapter.notifyDataSetChanged()
         }
@@ -104,20 +107,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
     }
-    // --- ここまで追加する ---
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        // idがtoolbarがインポート宣言により取得されているので
-        // id名でActionBarのサポートを依頼
+        setSupportActionBar(findViewById(R.id.toolbar))
+
         setSupportActionBar(toolbar)
 
-        // fabにClickリスナーを登録
         fab.setOnClickListener { view ->
             // ジャンルを選択していない場合（mGenre == 0）はエラーを表示するだけ
             if (mGenre == 0) {
-                Snackbar.make(view, getString(R.string.question_no_select_genre), Snackbar.LENGTH_LONG).show()
+                Snackbar.make(
+                    view,
+                    getString(R.string.question_no_select_genre),
+                    Snackbar.LENGTH_LONG
+                ).show()
             } else {
 
             }
@@ -137,12 +142,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         // ナビゲーションドロワーの設定
-        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.app_name, R.string.app_name)
+        val toggle = ActionBarDrawerToggle(
+            this,
+            drawer_layout,
+            toolbar,
+            R.string.app_name,
+            R.string.app_name
+        )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        val navigationView = findViewById<NavigationView>(com.google.firebase.database.R.id.nav_view)
-        nav_view.setNavigationItemSelectedListener(this)
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
 
         // Firebase
         mDatabaseReference = FirebaseDatabase.getInstance().reference
@@ -152,7 +163,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mQuestionArrayList = ArrayList<Question>()
         mAdapter.notifyDataSetChanged()
 
-        listView.setOnItemClickListener{parent, view, position, id ->
+        listView.setOnItemClickListener { parent, view, position, id ->
             // Questionのインスタンスを渡して質問詳細画面を起動する
             val intent = Intent(applicationContext, QuestionDetailActivity::class.java)
             intent.putExtra("question", mQuestionArrayList[position])
@@ -162,15 +173,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume() {
         super.onResume()
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+
         // 1:趣味を既定の選択とする
-        if(mGenre == 0) {
-            onNavigationItemSelected(nav_view.menu.getItem(0))
+        if (mGenre == 0) {
+            onNavigationItemSelected(navigationView.menu.getItem(0))
         }
     }
-    // --- ここまで追加する ---
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu this adds items to the action bar if it is present.
+        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
@@ -178,11 +190,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == com.google.firebase.database.R.id.action_settings) {
+        if (id == R.id.action_settings) {
             val intent = Intent(applicationContext, SettingActivity::class.java)
             startActivity(intent)
             return true
-        }else if (id == com.google.firebase.database.R.id.action_favorite) {
+        } else if (id == R.id.action_favorite) {
             val intent = Intent(applicationContext, FavoriteActivity::class.java)
             startActivity(intent)
             return true
@@ -210,8 +222,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
 
-        // --- ここから ---
-        // 質問のリストをクリアしてから再度Adapterにセットし、AdapterをListViewにセットし直す
         mQuestionArrayList.clear()
         mAdapter.setQuestionArrayList(mQuestionArrayList)
         listView.adapter = mAdapter
@@ -237,8 +247,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             } else {
                                 byteArrayOf()
                             }
-                        Question(firestoreQuestion.title, firestoreQuestion.body, firestoreQuestion.name, firestoreQuestion.uid,
-                            firestoreQuestion.id, firestoreQuestion.genre, bytes, firestoreQuestion.answers)
+                        Question(
+                            firestoreQuestion.title,
+                            firestoreQuestion.body,
+                            firestoreQuestion.name,
+                            firestoreQuestion.uid,
+                            firestoreQuestion.id,
+                            firestoreQuestion.genre,
+                            bytes,
+                            firestoreQuestion.answers
+                        )
                     }
                 }
                 mQuestionArrayList.clear()
