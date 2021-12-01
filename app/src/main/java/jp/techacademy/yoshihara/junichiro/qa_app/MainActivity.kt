@@ -24,7 +24,6 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 //import com.google.firebase.database.R
 
-
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private var mGenre = 0
@@ -64,10 +63,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-            val question = Question(
-                title, body, name, uid, dataSnapshot.key ?: "",
-                mGenre, bytes, answerArrayList
-            )
+            val question = Question(title, body, name, uid, dataSnapshot.key ?: "",
+                mGenre, bytes, answerArrayList)
             mQuestionArrayList.add(question)
             mAdapter.notifyDataSetChanged()
         }
@@ -109,7 +106,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
     }
-    //まずここが呼び出される
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -120,11 +117,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fab.setOnClickListener { view ->
             // ジャンルを選択していない場合（mGenre == 0）はエラーを表示するだけ
             if (mGenre == 0) {
-                Snackbar.make(
-                    view,
-                    getString(R.string.question_no_select_genre),
-                    Snackbar.LENGTH_LONG
-                ).show()
+                Snackbar.make(view, getString(R.string.question_no_select_genre), Snackbar.LENGTH_LONG).show()
             } else {
 
             }
@@ -144,13 +137,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         // ナビゲーションドロワーの設定
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawer_layout,
-            toolbar,
-            R.string.app_name,
-            R.string.app_name
-        )
+        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.app_name, R.string.app_name)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -165,7 +152,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mQuestionArrayList = ArrayList<Question>()
         mAdapter.notifyDataSetChanged()
 
-        listView.setOnItemClickListener { parent, view, position, id ->
+        listView.setOnItemClickListener{parent, view, position, id ->
             // Questionのインスタンスを渡して質問詳細画面を起動する
             val intent = Intent(applicationContext, QuestionDetailActivity::class.java)
             intent.putExtra("question", mQuestionArrayList[position])
@@ -179,7 +166,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         if (user == null) {
             navigationView.menu.findItem(R.id.action_favorite).isVisible = false
-        }else{
+        } else {
             navigationView.menu.findItem(R.id.action_favorite).isVisible = true
         }
         // 1:趣味を既定の選択とする
@@ -187,7 +174,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             onNavigationItemSelected(navigationView.menu.getItem(0))
         }
     }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -201,7 +187,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val intent = Intent(applicationContext, SettingActivity::class.java)
             startActivity(intent)
             return true
-        } else if (id == R.id.action_favorite) {
+        }else if (id == R.id.action_favorite) {
             val intent = Intent(applicationContext, FavoriteActivity::class.java)
             startActivity(intent)
             return true
@@ -209,8 +195,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         return super.onOptionsItemSelected(item)
     }
-//    val user = FirebaseAuth.getInstance().currentUser
-//    nav_view.menu.getItem(4).isVisible = user != null
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
@@ -227,23 +211,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.nav_compter) {
             toolbar.title = getString(R.string.menu_compter_label)
             mGenre = 4
-        }
-        else if (id == R.id.action_favorite) {
+        }else if(id == R.id.action_favorite){
             val user = FirebaseAuth.getInstance().currentUser
-            if (user != null) {
+            if(user != null){
                 val intent = Intent(applicationContext, FavoriteActivity::class.java)
                 startActivity(intent)
-//                else if (id == R.id.nav_favorite) {
-//                    toolbar.title = "お気に入り一覧"
-//                    mGenre = 5
                 return true
-
             }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
-        //0ならデータをとってこれていない
-        //Log.d("test", mQuestionArrayList.size.toString())
+
         mQuestionArrayList.clear()
         mAdapter.setQuestionArrayList(mQuestionArrayList)
         listView.adapter = mAdapter
@@ -251,20 +229,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         snapshotListener?.remove()
 
         // 選択したジャンルにリスナーを登録する
-
         snapshotListener = FirebaseFirestore.getInstance()
             .collection(ContentsPATH)
             .whereEqualTo("genre", mGenre)
             .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                Log.d("test", querySnapshot.toString())
-                Log.d("test", firebaseFirestoreException.toString())
                 if (firebaseFirestoreException != null) {
                     // 取得エラー
                     return@addSnapshotListener
                 }
                 var questions = listOf<Question>()
                 val results = querySnapshot?.toObjects(FirestoreQuestion::class.java)
-                Log.d("test", results.toString())
                 results?.also {
                     questions = it.map { firestoreQuestion ->
                         val bytes =
@@ -273,16 +247,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             } else {
                                 byteArrayOf()
                             }
-                        Question(
-                            firestoreQuestion.title,
-                            firestoreQuestion.body,
-                            firestoreQuestion.name,
-                            firestoreQuestion.uid,
-                            firestoreQuestion.id,
-                            firestoreQuestion.genre,
-                            bytes,
-                            firestoreQuestion.answers
-                        )
+                        Question(firestoreQuestion.title, firestoreQuestion.body, firestoreQuestion.name, firestoreQuestion.uid,
+                            firestoreQuestion.id, firestoreQuestion.genre, bytes, firestoreQuestion.answers)
                     }
                 }
                 mQuestionArrayList.clear()
