@@ -3,7 +3,7 @@ package jp.techacademy.yoshihara.junichiro.qa_app
 import java.util.*
 import kotlin.collections.ArrayList
 
-class FirestoreQuestion {
+class FireStoreQuestion {
     var id = UUID.randomUUID().toString()
     var title = ""
     var body = ""

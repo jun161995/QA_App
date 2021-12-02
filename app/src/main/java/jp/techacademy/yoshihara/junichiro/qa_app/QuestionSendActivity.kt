@@ -144,7 +144,7 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
             // Preferenceから名前を取る
             val sp = PreferenceManager.getDefaultSharedPreferences(this)
             val name = sp.getString(NameKEY, "")
-            var fireStoreQuestion = FirestoreQuestion()
+            var fireStoreQuestion = FireStoreQuestion()
             Log.d("test", title)
 
             fireStoreQuestion.uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""

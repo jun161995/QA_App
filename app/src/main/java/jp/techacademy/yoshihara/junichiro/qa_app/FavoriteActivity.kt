@@ -8,18 +8,21 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_favorite.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.content_main.*
 
 class FavoriteActivity : AppCompatActivity() {
 
     private var mFavorite: MutableList<String> = mutableListOf()
     private var keySplit: List<String> = ArrayList<String>()
-    private var result: MutableList<FirestoreQuestion> = mutableListOf()
+    private var result: MutableList<FireStoreQuestion> = mutableListOf()
 
     private lateinit var mDatabaseReference: DatabaseReference
     private lateinit var mQuestionArrayList: ArrayList<Question>
@@ -58,11 +61,11 @@ class FavoriteActivity : AppCompatActivity() {
         if (user != null) {
             for (entry in data.all) {
                 val key: String = entry.key
-                keySplit = key.split("/")
+                keySplit = key.split("-")
                 val value: Any? = entry.value
-                Log.d("TEST", keySplit[1].toString())
+                Log.d("test_key", key)
                 if (entry.value == true) {
-                    mFavorite.add(keySplit[1].toString())
+                    mFavorite.add(keySplit[0].toString())
                 }
             }
         }
@@ -77,6 +80,7 @@ class FavoriteActivity : AppCompatActivity() {
 
         snapshotListener?.remove()
 
+
         // 選択したジャンルにリスナーを登録する
         snapshotListener = FirebaseFirestore.getInstance()
             .collection(ContentsPATH)
@@ -86,7 +90,7 @@ class FavoriteActivity : AppCompatActivity() {
                     return@addSnapshotListener
                 }
                 var questions = listOf<Question>()
-                val results = querySnapshot?.toObjects(FirestoreQuestion::class.java)
+                val results = querySnapshot?.toObjects(FireStoreQuestion::class.java)
                 results?.also {
                     result.clear()
                     for (value in it) {

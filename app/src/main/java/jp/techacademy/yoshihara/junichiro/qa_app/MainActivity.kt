@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     return@addSnapshotListener
                 }
                 var questions = listOf<Question>()
-                val results = querySnapshot?.toObjects(FirestoreQuestion::class.java)
+                val results = querySnapshot?.toObjects(FireStoreQuestion::class.java)
                 results?.also {
                     questions = it.map { firestoreQuestion ->
                         val bytes =

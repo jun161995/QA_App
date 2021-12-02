@@ -10,7 +10,13 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import io.grpc.InternalChannelz.id
+import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.android.synthetic.main.list_question_detail.view.*
+import io.grpc.InternalChannelz.id
 
 class QuestionDetailListAdapter(context: Context, private val mQuestion: Question) : BaseAdapter() {
     companion object {
@@ -21,6 +27,8 @@ class QuestionDetailListAdapter(context: Context, private val mQuestion: Questio
     private var mLayoutInflater: LayoutInflater? = null
     private var isFavorite = false
     private var titleFFlag = ""
+
+    private lateinit var mQuestionReference: DatabaseReference
 
     init {
         mLayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -53,6 +61,8 @@ class QuestionDetailListAdapter(context: Context, private val mQuestion: Questio
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
         var convertView = view
 
+
+
         if (getItemViewType(position) == TYPE_QUESTION) {
             if (convertView == null) {
                 if(FirebaseAuth.getInstance().currentUser != null) {
@@ -78,24 +88,39 @@ class QuestionDetailListAdapter(context: Context, private val mQuestion: Questio
                 imageView.setImageBitmap(image)
             }
 
-            titleFFlag = mQuestion.title
 
             var context = convertView.context
 
             val data = context.getSharedPreferences("favoriteFlags", Context.MODE_PRIVATE)
-            isFavorite = data.getBoolean(mQuestion.uid+"/"+titleFFlag,false)
+            isFavorite = data.getBoolean(mQuestion.uid+"-"+titleFFlag,false)
+            var fireStoreQuestion = FireStoreQuestion()
 
-            if (FirebaseAuth.getInstance().currentUser != null) {
+
+                    if (FirebaseAuth.getInstance().currentUser != null) {
+                // Firebas
+                mQuestionReference = FirebaseDatabase.getInstance().reference
                 var favoriteImageView = convertView.findViewById<ImageView>(R.id.favoriteImageView)
                 favoriteImageView.setImageResource(if (isFavorite) R.drawable.ic_star else R.drawable.ic_star_border)
                 favoriteImageView.setOnClickListener {
                     val edit = data.edit()
                     if(isFavorite) {
                         isFavorite = false
-                        edit.putBoolean(mQuestion.uid+"/"+titleFFlag,false)
+                        //ここから
+                        FirebaseFirestore.getInstance().collection(ContentsPATH).document(fireStoreQuestion.id).delete()
+
+                        val favRef = mQuestionReference.child(FavoritesPATH).child(mQuestion.uid)
+                        val data = fireStoreQuestion.id
+                        favRef.setValue(data)
+                        //ここまで
                     }else {
                         isFavorite = true
-                        edit.putBoolean(mQuestion.uid+"/"+titleFFlag,true)
+                        //ここから
+                        FirebaseFirestore.getInstance().collection(ContentsPATH).document(fireStoreQuestion.id).set(fireStoreQuestion)
+
+                        val favRef = mQuestionReference.child(FavoritesPATH).child(mQuestion.uid)
+                        val data = fireStoreQuestion.id
+                        favRef.setValue(data)
+                        //ここまで
                     }
                     edit.commit()
                     favoriteImageView.setImageResource(if (isFavorite) R.drawable.ic_star else R.drawable.ic_star_border)
