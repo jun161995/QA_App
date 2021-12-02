@@ -114,7 +114,7 @@ class QuestionDetailListAdapter(context: Context, private val mQuestion: Questio
                     }else {
                         isFavorite = true
                         //ここから
-                        FirebaseFirestore.getInstance().collection(ContentsPATH).document(fireStoreQuestion.id).set(fireStoreQuestion)
+                        FirebaseFirestore.getInstance().collection(FavoritesPATH).document(fireStoreQuestion.id).set(fireStoreQuestion)
 
                         val favRef = mQuestionReference.child(FavoritesPATH).child(mQuestion.uid)
                         val data = fireStoreQuestion.id

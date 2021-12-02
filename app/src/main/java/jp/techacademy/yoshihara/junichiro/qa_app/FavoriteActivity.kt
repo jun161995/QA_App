@@ -56,67 +56,84 @@ class FavoriteActivity : AppCompatActivity() {
     }
 
     private fun load() {
-        val data = getSharedPreferences("favoriteFlags", Context.MODE_PRIVATE)
+
+        //val data = FirebaseFirestore.getInstance().collection(FavoritesPATH).document(fireStoreQuestion.id)
         val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            for (entry in data.all) {
-                val key: String = entry.key
-                keySplit = key.split("-")
-                val value: Any? = entry.value
-                Log.d("test_key", key)
-                if (entry.value == true) {
-                    mFavorite.add(keySplit[0].toString())
+        //現在ログインしているアカウントのお気に入り情報
+        // [fireStoreQuestion.uid == currentUser かつ　title == null]
+
+        fun load() {
+            val data = getSharedPreferences("favoriteFlags", Context.MODE_PRIVATE)
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                for (entry in data.all) {
+                    val key: String = entry.key
+                    keySplit = key.split("-")
+                    val value: Any? = entry.value
+                    Log.d("test_key", key)
+                    if (entry.value == true) {
+                        mFavorite.add(keySplit[0].toString())
+                    }
                 }
             }
-        }
 
-        val listView = findViewById<ListView>(R.id.listViewFavorite)
+
+            val listView = findViewById<ListView>(R.id.listViewFavorite)
 //        val adapter = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, mFavorite)
 
 //        listView.adapter = adapter
-        mQuestionArrayList.clear()
-        mAdapter.setQuestionArrayList(mQuestionArrayList)
-        listView.adapter = mAdapter
+            mQuestionArrayList.clear()
+            mAdapter.setQuestionArrayList(mQuestionArrayList)
+            listView.adapter = mAdapter
 
-        snapshotListener?.remove()
+            snapshotListener?.remove()
 
 
-        // 選択したジャンルにリスナーを登録する
-        snapshotListener = FirebaseFirestore.getInstance()
-            .collection(ContentsPATH)
-            .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                if (firebaseFirestoreException != null) {
-                    // 取得エラー
-                    return@addSnapshotListener
-                }
-                var questions = listOf<Question>()
-                val results = querySnapshot?.toObjects(FireStoreQuestion::class.java)
-                results?.also {
-                    result.clear()
-                    for (value in it) {
-                        for (value2 in mFavorite) {
-                            if (value.title == value2) {
-                                result.add(value)
-                                Log.d("test", "notremove!!")
+            // 選択したジャンルにリスナーを登録する
+            snapshotListener = FirebaseFirestore.getInstance()
+                .collection(ContentsPATH)
+                .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+                    if (firebaseFirestoreException != null) {
+                        // 取得エラー
+                        return@addSnapshotListener
+                    }
+                    var questions = listOf<Question>()
+                    val results = querySnapshot?.toObjects(FireStoreQuestion::class.java)
+                    results?.also {
+                        result.clear()
+                        for (value in it) {
+                            for (value2 in mFavorite) {
+                                if (value.id == value2) {
+                                    result.add(value)
+                                    Log.d("test", "notremove!!")
+                                }
                             }
                         }
+                        Log.d("test", "removeend!!")
+                        questions = result.map { firestoreQuestion ->
+                            val bytes =
+                                if (firestoreQuestion.image.isNotEmpty()) {
+                                    Base64.decode(firestoreQuestion.image, Base64.DEFAULT)
+                                } else {
+                                    byteArrayOf()
+                                }
+                            Question(
+                                firestoreQuestion.title,
+                                firestoreQuestion.body,
+                                firestoreQuestion.name,
+                                firestoreQuestion.uid,
+                                firestoreQuestion.id,
+                                firestoreQuestion.genre,
+                                bytes,
+                                firestoreQuestion.answers
+                            )
+                        }
                     }
-                    Log.d("test", "removeend!!")
-                    questions = result.map { firestoreQuestion ->
-                        val bytes =
-                            if (firestoreQuestion.image.isNotEmpty()) {
-                                Base64.decode(firestoreQuestion.image, Base64.DEFAULT)
-                            } else {
-                                byteArrayOf()
-                            }
-                        Question(firestoreQuestion.title, firestoreQuestion.body, firestoreQuestion.name, firestoreQuestion.uid,
-                            firestoreQuestion.id, firestoreQuestion.genre, bytes, firestoreQuestion.answers)
-                    }
-                }
 
-                mQuestionArrayList.clear()
-                mQuestionArrayList.addAll(questions)
-                mAdapter.notifyDataSetChanged()
-            }
+                    mQuestionArrayList.clear()
+                    mQuestionArrayList.addAll(questions)
+                    mAdapter.notifyDataSetChanged()
+                }
+        }
     }
 }
