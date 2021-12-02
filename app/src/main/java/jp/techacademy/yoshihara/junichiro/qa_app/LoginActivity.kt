@@ -72,10 +72,9 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     userRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            val data = snapshot.value as Map<*, *>?
-                            if(data!!["name"] != null) {
+                            val data = snapshot.value as Map<*,*>?
                                 saveName(data!!["name"] as String)
-                            }
+
                         }
 
                         override fun onCancelled(firebaseError: DatabaseError) {}

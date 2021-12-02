@@ -92,9 +92,8 @@ class QuestionDetailListAdapter(context: Context, private val mQuestion: Questio
             var context = convertView.context
 
             val data = context.getSharedPreferences("favoriteFlags", Context.MODE_PRIVATE)
-            isFavorite = data.getBoolean(mQuestion.uid+"-"+titleFFlag,false)
             var fireStoreQuestion = FireStoreQuestion()
-
+            isFavorite = data.getBoolean(mQuestion.uid+"-"+fireStoreQuestion.id,false)
 
                     if (FirebaseAuth.getInstance().currentUser != null) {
                 // Firebas
