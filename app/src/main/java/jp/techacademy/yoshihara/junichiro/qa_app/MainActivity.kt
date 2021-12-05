@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             // 変更があったQuestionを探す
             for (question in mQuestionArrayList) {
-                if (dataSnapshot.key!!.equals(question.questionUid)) {
+                if (dataSnapshot.key.equals(question.questionUid)) {
                     // このアプリで変更がある可能性があるのは回答（Answer)のみ
                     question.answers.clear()
                     val answerMap = map["answers"] as Map<String, String>?
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(toolbar)
 
         val user = FirebaseAuth.getInstance().currentUser
 
