@@ -19,8 +19,6 @@ import io.grpc.InternalChannelz.id
 import kotlinx.android.synthetic.main.activity_setting.*
 import kotlinx.android.synthetic.main.list_question_detail.view.*
 import io.grpc.InternalChannelz.id
-import kotlinx.android.synthetic.main.list_answer.view.*
-import kotlinx.android.synthetic.main.list_question_detail.view.nameTextView
 import java.util.HashMap
 
 
