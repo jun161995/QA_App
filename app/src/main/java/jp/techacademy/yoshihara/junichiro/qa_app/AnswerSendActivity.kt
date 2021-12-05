@@ -2,6 +2,7 @@ package jp.techacademy.yoshihara.junichiro.qa_app
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.preference.PreferenceManager
@@ -41,7 +42,9 @@ class AnswerSendActivity : AppCompatActivity(), View.OnClickListener, DatabaseRe
     override fun onClick(v: View) {
         // キーボードが出てたら閉じる
         val im = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        im.hideSoftInputFromWindow(v.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        if (v != null) {
+            im.hideSoftInputFromWindow(v.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
 
         val dataBaseReference = FirebaseDatabase.getInstance().reference
         val answerRef = dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString()).child(mQuestion.questionUid).child(AnswersPATH)
@@ -68,6 +71,9 @@ class AnswerSendActivity : AppCompatActivity(), View.OnClickListener, DatabaseRe
         data["body"] = answer
 
         progressBar.visibility = View.VISIBLE
-        answerRef.push().setValue(data, this)
+        try{
+            answerRef.push().setValue(data,this)
+        }catch(e: Exception){
+        }
     }
 }

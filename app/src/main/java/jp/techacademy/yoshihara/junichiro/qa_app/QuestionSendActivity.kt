@@ -132,7 +132,6 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
             if (title.isEmpty()) {
                 // タイトルが入力されていない時はエラーを表示するだけ
                 Snackbar.make(v, getString(R.string.input_title), Snackbar.LENGTH_LONG).show()
-                return
             }
 
             if (body.isEmpty()) {
@@ -144,14 +143,11 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
             // Preferenceから名前を取る
             val sp = PreferenceManager.getDefaultSharedPreferences(this)
             val name = sp.getString(NameKEY, "")
-            var fireStoreQuestion = FireStoreQuestion()
             Log.d("test", title)
 
-            fireStoreQuestion.uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-            fireStoreQuestion.title = title
-            fireStoreQuestion.body = body
-            fireStoreQuestion.name = name!!
-            fireStoreQuestion.genre = mGenre
+            data["title"] = title
+            data["body"] = body
+            data["name"] = name!!
 
             // 添付画像を取得する
             val drawable = imageView.drawable as? BitmapDrawable
@@ -162,24 +158,11 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
                 val baos = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
                 val bitmapString = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
-
-                fireStoreQuestion.image = bitmapString
+                data["image"] = bitmapString
             }
 
             genreRef.push().setValue(data, this)
-            FirebaseFirestore.getInstance()
-                .collection(ContentsPATH)
-                .document(fireStoreQuestion.id)
-                .set(fireStoreQuestion)
-                .addOnSuccessListener {
-                    progressBar.visibility = View.GONE
-                    finish()
-                }
-                .addOnFailureListener {
-                    it.printStackTrace()
-                    progressBar.visibility = View.GONE
-                    Snackbar.make(findViewById(android.R.id.content), getString(R.string.question_send_error_message), Snackbar.LENGTH_LONG).show()
-                }
+            progressBar.visibility = View.VISIBLE
         }
     }
 
@@ -222,10 +205,10 @@ class QuestionSendActivity : AppCompatActivity(), View.OnClickListener, Database
         startActivityForResult(chooserIntent, CHOOSER_REQUEST_CODE)
     }
 
-    override fun onComplete(databaseError: DatabaseError?, databaseReference: DatabaseReference) {
+    override fun onComplete(error: DatabaseError?, ref: DatabaseReference) {
         progressBar.visibility = View.GONE
 
-        if (databaseError == null) {
+        if (error == null) {
             finish()
         } else {
             Snackbar.make(findViewById(android.R.id.content), getString(R.string.question_send_error_message), Snackbar.LENGTH_LONG).show()

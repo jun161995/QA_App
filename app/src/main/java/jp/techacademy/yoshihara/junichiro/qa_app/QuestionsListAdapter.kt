@@ -26,19 +26,19 @@ class QuestionsListAdapter(context: Context) : BaseAdapter() {
         return mQuestionArrayList.size
     }
 
-    override fun getItem(position: Int): Any {
-        return mQuestionArrayList[position]
+    override fun getItem(p0: Int): Any {
+        return mQuestionArrayList[p0]
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
+    override fun getItemId(p0: Int): Long {
+        return p0.toLong()
     }
 
-    override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+    override fun getView(position: Int, view: View?, viewGroup: ViewGroup): View {
         var convertView = view
 
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.list_questions, parent, false)
+            convertView = mLayoutInflater.inflate(R.layout.list_questions, viewGroup, false)
         }
 
         val titleText = convertView!!.titleTextView as TextView

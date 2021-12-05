@@ -25,6 +25,7 @@ class SettingActivity : AppCompatActivity() {
 
         mDataBaseReference = FirebaseDatabase.getInstance().reference
 
+        val user = FirebaseAuth.getInstance().currentUser
         // UIの初期設定
         title = getString(R.string.settings_titile)
 
