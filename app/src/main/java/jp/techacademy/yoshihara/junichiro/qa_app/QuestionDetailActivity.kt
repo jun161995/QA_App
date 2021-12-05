@@ -3,22 +3,23 @@ package jp.techacademy.yoshihara.junichiro.qa_app
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_question_detail.*
 
 class QuestionDetailActivity : AppCompatActivity() {
     private lateinit var mQuestion: Question
-    private lateinit var mQuestionKey: String
     private lateinit var mAdapter: QuestionDetailListAdapter
     private lateinit var mAnswerRef: DatabaseReference
-
+    private lateinit var mFavoriteRef: DatabaseReference
+    private var isFavorite: Boolean = false
     // 回答表示画面から戻ってきた時に回答が追加されているように、onChildAddedの時にDBからgetしておく
     private val mEventListener = object : ChildEventListener{
-        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-            val map = snapshot.value as Map<*, *>
+        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
+            val map = dataSnapshot.value as Map<*, *>
 
-            val answerUid =  snapshot.key ?: ""
+            val answerUid =  dataSnapshot.key ?: ""
 
             for(answer in mQuestion.answers){
                 // 同じAnswerUidのものが存在しているときは何もしない
@@ -29,8 +30,8 @@ class QuestionDetailActivity : AppCompatActivity() {
 
             val body = map["body"] as? String ?:""
             val name = map["name"] as? String ?: ""
-            val uid = map["uid"] as? String ?: ""
 
+            val uid = map["uid"] as? String ?: ""
             val answer = Answer(body, name, uid, answerUid)
             mQuestion.answers.add(answer)
             mAdapter.notifyDataSetChanged()
@@ -51,20 +52,44 @@ class QuestionDetailActivity : AppCompatActivity() {
 
         }
     }
+    private val fEvantListener = object : ChildEventListener {
+        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
+            // このonChildAddedにくるということはデータが存在するということなので、お気に入りだと確定する。よってisFavoriteをtrueして画像変えるだけで良い。
+            isFavorite = true
+            star.setImageResource(R.drawable.ic_star)
+            //Log.d("check", "onChildAdded")
+
+        }
+
+        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onChildRemoved(snapshot: DataSnapshot) {
+            //Log.d("check", "onChiledRemoved done")
+        }
+
+        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            TODO("Not yet implemented")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_question_detail)
+
+        isFavorite = false
         // 渡ってきたQuestionのオブジェクトを保持する
         val extras = intent.extras
         mQuestion = extras!!.get("question") as Question
 
         title = mQuestion.title
 
-        // お気に入り情報のintentも取得
-        var isFavorite: Boolean = false
-        isFavorite = extras!!.get("isFavorite") as Boolean
         // ListViewの準備
-        mAdapter = QuestionDetailListAdapter(this, mQuestion,isFavorite)
+        mAdapter = QuestionDetailListAdapter(this, mQuestion)
         listView.adapter = mAdapter
         mAdapter.notifyDataSetChanged()
 
@@ -86,5 +111,57 @@ class QuestionDetailActivity : AppCompatActivity() {
         val dataBaseReference = FirebaseDatabase.getInstance().reference
         mAnswerRef = dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString()).child(mQuestion.questionUid).child(AnswersPATH)
         mAnswerRef.addChildEventListener(mEventListener)
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val uid = FirebaseAuth.getInstance().uid
+
+        mFavoriteRef = dataBaseReference.child(FavoritesPATH).child(uid.toString()).child(mQuestion.questionUid)
+        mFavoriteRef.addChildEventListener(fEvantListener)
+
+
+        //Log.d("check" , user.toString())
+        //Log.d("check", uid.toString())
+        if (user == null) {
+            star.hide()
+        }
+        else{
+            // お気に入りボタンの機能実装
+            star.setOnClickListener {
+                if(isFavorite){
+                    onDeleteFavorite(uid.toString(), mQuestion.questionUid)
+                    star.setImageResource(R.drawable.ic_star_border)
+                    isFavorite = false
+                }
+                else{
+                    onAddFavorite(uid.toString(), mQuestion.questionUid, mQuestion.genre.toString())
+                    star.setImageResource(R.drawable.ic_star)
+                    isFavorite = true
+                }
+            }
+        }
+
     }
+
+
+override fun onResume() {
+    super.onResume()
+    Log.d("check", "onResume")
+}
+
+private fun onAddFavorite(uid: String, qUid: String, genre: String){
+    Log.d("check", "onAdd done")
+    val dataBaseReference = FirebaseDatabase.getInstance().reference
+    val FavRef = dataBaseReference.child(FavoritesPATH).child(uid).child(qUid)
+    val map =  HashMap<String,String>()
+    map["genre"] = genre
+    FavRef.setValue(map)
+}
+
+private fun onDeleteFavorite(uid: String, qUid: String){
+    Log.d("check", "onDelete done")
+    val dataBaseReference = FirebaseDatabase.getInstance().reference
+    val FavRef = dataBaseReference.child(FavoritesPATH).child(uid).child(qUid)
+    FavRef.removeValue()
+}
+
 }

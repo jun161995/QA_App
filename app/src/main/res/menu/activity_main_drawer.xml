@@ -15,9 +15,7 @@
             android:id="@+id/nav_compter"
             android:title="@string/menu_compter_label"/>
         <item
-            android:id="@+id/action_favorite"
-            android:orderInCategory="100"
-            android:title="@string/favorite_title"
-            app:showAsAction="never" />
+            android:id="@+id/nav_favorite"
+            android:title="お気に入り"/>
     </group>
 </menu>
