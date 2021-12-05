@@ -1,6 +1,7 @@
 package jp.techacademy.yoshihara.junichiro.qa_app
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var mCreateAccountListener: OnCompleteListener<AuthResult>
     private lateinit var mLoginListener: OnCompleteListener<AuthResult>
     private lateinit var mDataBaseReference: DatabaseReference
+
 
     // アカウント作成時にフラグを立て、ログイン処理後に名前をFirebaseに保存する
     private var mIsCreateAccount = false
@@ -40,6 +42,9 @@ class LoginActivity : AppCompatActivity() {
                 val email = emailText.text.toString()
                 val password = passwordText.text.toString()
                 login(email, password)
+
+
+
             } else {
 
                 // 失敗した場合
@@ -58,6 +63,9 @@ class LoginActivity : AppCompatActivity() {
                 // 成功した場合
                 val user = mAuth.currentUser
                 val userRef = mDataBaseReference.child(UsersPATH).child(user!!.uid)
+
+
+
 
                 if (mIsCreateAccount) {
                     // アカウント作成の時は表示名をFirebaseに保存する
@@ -110,16 +118,22 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordText.text.toString()
             val name = nameText.text.toString()
 
-            if (email.length != 0 && password.length >= 6 && name.length != 0) {
-                // ログイン時に表示名を保存するようにフラグを立てる
-                mIsCreateAccount = true
+            val pattern = "^[A-Za-z0-9]+$"
 
-                createAccount(email, password)
-            } else {
-                // エラーを表示する
+            if (email.length != 0 && password.length >= 6 && name.length != 0) {
+                if (Regex(pattern).matches(name)) {
+                    mIsCreateAccount = true
+                    createAccount(email, password)
+                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    Snackbar.make(v, "名前に使用できるのは半角英数のみです", Snackbar.LENGTH_LONG).show()
+                }
+            }else {
                 Snackbar.make(v, getString(R.string.login_error_message), Snackbar.LENGTH_LONG).show()
             }
         }
+
 
         loginButton.setOnClickListener { v ->
             // キーボードが出てたら閉じる
@@ -134,6 +148,10 @@ class LoginActivity : AppCompatActivity() {
                 mIsCreateAccount = false
 
                 login(email, password)
+
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                startActivity(intent)
+
             } else {
                 // エラーを表示する
                 Snackbar.make(v, getString(R.string.login_error_message), Snackbar.LENGTH_LONG).show()
