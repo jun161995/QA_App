@@ -14,11 +14,10 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.list_questions.view.*
 
 class QuestionsListAdapter(context: Context) : BaseAdapter() {
-    private var mLayoutInflater: LayoutInflater
+    private var mLayoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private var mQuestionArrayList = ArrayList<Question>()
 
     init {
-        mLayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         Log.d("test","QuestiosListAdapterを呼べている")
     }
 

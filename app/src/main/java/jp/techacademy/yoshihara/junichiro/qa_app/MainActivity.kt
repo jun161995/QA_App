@@ -29,8 +29,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var mGenreRef: DatabaseReference? = null
     private val mEventListener = object : ChildEventListener {
-        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
-            val map = dataSnapshot.value as Map<String, String>
+        override fun onChildAdded(snapshot: DataSnapshot, s: String?) {
+            val map = snapshot.value as Map<String, String>
             val title = map["title"] ?: ""
             val body = map["body"] ?: ""
             val name = map["name"] ?: ""
@@ -56,19 +56,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-            val question = Question(title, body, name, uid, dataSnapshot.key ?: "",
+            val question = Question(title, body, name, uid, snapshot.key ?: "",
                 mGenre, bytes, answerArrayList)
             mQuestionArrayList.add(question)
             mAdapter.notifyDataSetChanged()
         }
 
-        override fun onChildChanged(dataSnapshot: DataSnapshot, s: String?) {
-            val map = dataSnapshot.value as Map<String, String>
+        override fun onChildChanged(snapshot: DataSnapshot, s: String?) {
+            val map = snapshot.value as Map<String, String>
 
-            // 変更があったQuestionを探す
             for (question in mQuestionArrayList) {
-                if (dataSnapshot.key.equals(question.questionUid)) {
-                    // このアプリで変更がある可能性があるのは回答（Answer)のみ
+                if (snapshot.key.equals(question.questionUid)) {
                     question.answers.clear()
                     val answerMap = map["answers"] as Map<String, String>?
                     if (answerMap != null) {
@@ -88,95 +86,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
 
-        override fun onChildRemoved(p0: DataSnapshot) {
+        override fun onChildRemoved(snapshot: DataSnapshot) {
 
         }
 
-        override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+        override fun onChildMoved(snapshot: DataSnapshot, s: String?) {
 
         }
 
-        override fun onCancelled(p0: DatabaseError) {
+        override fun onCancelled(error: DatabaseError) {
 
         }
 
     }
-    private val mFavoriteEventListener = object : ChildEventListener {
-        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
-            val map = dataSnapshot.value as Map<String, String>
 
-            val favoriteRef = mDatabaseReference.child(ContentsPATH).child(map["genre"].toString()).child(dataSnapshot.key.toString())
-            favoriteRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val map = snapshot.value as Map<String, String>
-                    val title = map["title"] ?: ""
-                    val body = map["body"] ?: ""
-                    val name = map["name"] ?: ""
-                    val uid = map["uid"] ?: ""
-                    val imageString = map["image"] ?: ""
-                    val bytes =
-                        if (imageString.isNotEmpty()) {
-                            Base64.decode(imageString, Base64.DEFAULT)
-                        } else {
-                            byteArrayOf()
-                        }
-                    val answerArrayList = ArrayList<Answer>()
-                    val answerMap = map["answers"] as Map<String, String>?
-                    if (answerMap != null) {
-                        for (key in answerMap.keys) {
-                            val temp = answerMap[key] as Map<String, String>
-                            val answerBody = temp["body"] ?: ""
-                            val answerName = temp["name"] ?: ""
-                            val answerUid = temp["uid"] ?: ""
-                            val answer = Answer(answerBody, answerName, answerUid, key)
-                            answerArrayList.add(answer)
-                        }
-                    }
-                    val question = Question(title, body, name, uid, dataSnapshot.key ?: "",
-                        mGenre, bytes, answerArrayList)
-                    mQuestionArrayList.add(question)
-                    mAdapter.notifyDataSetChanged()
-                }
-
-                override fun onCancelled(firebaseError: DatabaseError) {}
-            })
-        }
-
-        override fun onChildChanged(dataSnapshot: DataSnapshot, s: String?) {
-            val map = dataSnapshot.value as Map<String, String>
-
-            for (question in mQuestionArrayList) {
-                if (dataSnapshot.key.equals(question.questionUid)) {
-                    question.answers.clear()
-                    val answerMap = map["answers"] as Map<String, String>?
-                    if (answerMap != null) {
-                        for (key in answerMap.keys) {
-                            val temp = answerMap[key] as Map<String, String>
-                            val answerBody = temp["body"] ?: ""
-                            val answerName = temp["name"] ?: ""
-                            val answerUid = temp["uid"] ?: ""
-                            val answer = Answer(answerBody, answerName, answerUid, key)
-                            question.answers.add(answer)
-                        }
-                    }
-
-                    mAdapter.notifyDataSetChanged()
-                }
-            }
-        }
-
-        override fun onChildRemoved(p0: DataSnapshot) {
-
-        }
-
-        override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-
-        }
-
-        override fun onCancelled(p0: DatabaseError) {
-
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -199,6 +122,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             val user = FirebaseAuth.getInstance().currentUser
             if (user == null) {
+                Log.d("login test", "Authがnull")
                 // ログインしていなければログイン画面に遷移させる
                 val intent = Intent(applicationContext, LoginActivity::class.java)
                 startActivity(intent)
@@ -251,9 +175,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (mGenre == 0) {
             onNavigationItemSelected(navigationView.menu.getItem(0))
         }
+
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
@@ -283,12 +207,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.nav_health) {
             toolbar.title = getString(R.string.menu_health_label)
             mGenre = 3
-        } else if (id == R.id.nav_compter) {
-            toolbar.title = getString(R.string.menu_compter_label)
+        } else if (id == R.id.nav_computer) {
+            toolbar.title = getString(R.string.menu_computer_label)
             mGenre = 4
         }else if(id == R.id.nav_favorite){
-            toolbar.title = "お気に入り"
-            mGenre = 5
+            val intent = Intent(applicationContext, FavoriteActivity::class.java)
+            startActivity(intent)
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         // お気に入り以外の時
@@ -300,21 +224,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (mGenreRef != null) {
             mGenreRef!!.removeEventListener(mEventListener)
         }
-        if(mGenre != 5){
-            mGenreRef = mDatabaseReference.child(ContentsPATH).child(mGenre.toString())
-            mGenreRef!!.addChildEventListener(mEventListener)
-        }
-        else{
-            val user = FirebaseAuth.getInstance().currentUser
-            if (user != null) {
-                mGenreRef = mDatabaseReference.child(FavoritesPATH).child(user.uid)
-                mGenreRef!!.addChildEventListener(mFavoriteEventListener)
-            }
-        }
-
+        mGenreRef = mDatabaseReference.child(ContentsPATH).child(mGenre.toString())
+        mGenreRef!!.addChildEventListener(mEventListener)
 
         return true
-        // --- ここまで追加する ---
     }
+
+
+
+
 
 }

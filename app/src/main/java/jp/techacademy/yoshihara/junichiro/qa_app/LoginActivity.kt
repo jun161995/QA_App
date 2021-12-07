@@ -42,9 +42,6 @@ class LoginActivity : AppCompatActivity() {
                 val email = emailText.text.toString()
                 val password = passwordText.text.toString()
                 login(email, password)
-
-
-
             } else {
 
                 // 失敗した場合
@@ -64,11 +61,14 @@ class LoginActivity : AppCompatActivity() {
                 val user = mAuth.currentUser
                 val userRef = mDataBaseReference.child(UsersPATH).child(user!!.uid)
 
+                Log.d("test arrival", "login isSuccessful")
 
 
 
                 if (mIsCreateAccount) {
                     // アカウント作成の時は表示名をFirebaseに保存する
+
+                    Log.d("test arrival", "新規登録")
                     val name = nameText.text.toString()
 
                     val data = HashMap<String, String>()
@@ -79,10 +79,10 @@ class LoginActivity : AppCompatActivity() {
                     saveName(name)
                 } else {
                     userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val data = snapshot.value as Map<*,*>?
-                                saveName(data!!["name"] as String)
-
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            Log.d("test arrival", "addListenerForSingleValueEventの頭まできたよ")
+                            val data = dataSnapshot.value as Map<*, *>?
+                            saveName(data!!["name"] as String)
                         }
 
                         override fun onCancelled(firebaseError: DatabaseError) {}
@@ -118,17 +118,17 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordText.text.toString()
             val name = nameText.text.toString()
 
-            val pattern = "^[A-Za-z0-9]+$"
+//            val pattern = "^[A-Za-z0-9]+$"
 
             if (email.length != 0 && password.length >= 6 && name.length != 0) {
-                if (Regex(pattern).matches(name)) {
+//                if (Regex(pattern).matches(name)) {
                     mIsCreateAccount = true
                     createAccount(email, password)
                     val intent = Intent(applicationContext, MainActivity::class.java)
                     startActivity(intent)
-                } else {
-                    Snackbar.make(v, "名前に使用できるのは半角英数のみです", Snackbar.LENGTH_LONG).show()
-                }
+//                } else {
+//                    Snackbar.make(v, "名前に使用できるのは半角英数のみです", Snackbar.LENGTH_LONG).show()
+//                }
             }else {
                 Snackbar.make(v, getString(R.string.login_error_message), Snackbar.LENGTH_LONG).show()
             }
@@ -169,6 +169,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun login(email: String, password: String) {
         // プログレスバーを表示する
+
+        Log.d("test", "loginを呼べている")
         progressBar.visibility = View.VISIBLE
 
         // ログインする

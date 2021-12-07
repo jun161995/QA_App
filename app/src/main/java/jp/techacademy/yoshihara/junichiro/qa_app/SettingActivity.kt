@@ -27,7 +27,7 @@ class SettingActivity : AppCompatActivity() {
 
         val user = FirebaseAuth.getInstance().currentUser
         // UIの初期設定
-        title = getString(R.string.settings_titile)
+        title = getString(R.string.settings_title)
 
         changeButton.setOnClickListener{v ->
             // キーボードが出ていたら閉じる

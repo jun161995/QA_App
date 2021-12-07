@@ -12,21 +12,36 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".AnswerSendActivity" />
-        <activity android:name=".QuestionDetailActivity" />
-        <activity android:name=".QuestionSendActivity" />
-        <activity android:name=".SettingActivity" />
+        android:supportsRtl="true">
+        <activity
+            android:name=".FavoriteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AnswerSendActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuestionDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuestionSendActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:exported="true"
+            android:label="@string/app_name"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
