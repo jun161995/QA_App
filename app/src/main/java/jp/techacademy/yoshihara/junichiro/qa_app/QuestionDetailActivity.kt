@@ -114,9 +114,9 @@ class QuestionDetailActivity : AppCompatActivity() {
 
     private fun btnAppearanceRefresh() {
             if (isFavorite) {
-                btnFav.text = "お気に入り追加"
-            } else {
                 btnFav.text = "お気に入り削除"
+            } else {
+                btnFav.text = "お気に入り追加"
             }
     }
 
