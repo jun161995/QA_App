@@ -9,6 +9,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.preference.PreferenceManager
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -93,7 +94,10 @@ class LoginActivity : AppCompatActivity() {
                 progressBar.visibility = View.GONE
 
                 // Activityを閉じる
-                finish()
+                //finish()
+                //上記だとログイン直後におnResume()が呼び出されずおきにいりが表示されないため修正
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                startActivity(intent)
 
             } else {
                 // 失敗した場合
@@ -104,6 +108,8 @@ class LoginActivity : AppCompatActivity() {
                 // プログレスバーを非表示にする
                 progressBar.visibility = View.GONE
             }
+
+
         }
 
         // タイトルの設定

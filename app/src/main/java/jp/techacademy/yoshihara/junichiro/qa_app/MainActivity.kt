@@ -138,9 +138,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        if(user == null){
-            nav_view.menu.getItem(4).isVisible = false
-        }
+
         nav_view.setNavigationItemSelectedListener(this)
 
         // Firebase
