@@ -12,7 +12,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="193101f4-4114-4e27-adf3-8e470878d26b" name="Default Changelist" comment="ログイン直後におnResume()が呼び出されずおきにいりが表示されないため修正">
+    <list default="true" id="193101f4-4114-4e27-adf3-8e470878d26b" name="Default Changelist" comment="細々とした148ファイルをアップ">
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/list_answer.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/list_answer.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -358,7 +358,14 @@
       <option name="project" value="LOCAL" />
       <updated>1638940637909</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="細々とした148ファイルをアップ">
+      <created>1638956692026</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1638956692026</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -388,6 +395,7 @@
     <MESSAGE value="日本語の名前禁止機能と、非ログイン時ログイン直後のみボタンでないバグ解消" />
     <MESSAGE value="バグ修正" />
     <MESSAGE value="ログイン直後におnResume()が呼び出されずおきにいりが表示されないため修正" />
-    <option name="LAST_COMMIT_MESSAGE" value="ログイン直後におnResume()が呼び出されずおきにいりが表示されないため修正" />
+    <MESSAGE value="細々とした148ファイルをアップ" />
+    <option name="LAST_COMMIT_MESSAGE" value="細々とした148ファイルをアップ" />
   </component>
 </project>
