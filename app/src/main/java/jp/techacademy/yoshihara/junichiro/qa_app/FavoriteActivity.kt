@@ -57,10 +57,8 @@ class FavoriteActivity : AppCompatActivity() {
                         genre.toInt(), bytes, answerArrayList)
                     mQuestionArrayList.add(question)
                     mAdapter.notifyDataSetChanged()
-                    Log.d("test99", "onChildAdded()完了")
                 }
                 override fun onCancelled(firebaseError: DatabaseError) {
-                    Log.d("test99", "onCancelled()")
                 }
             })
 
